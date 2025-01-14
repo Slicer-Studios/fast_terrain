@@ -1,10 +1,11 @@
-use godot::prelude::*;
-use godot::classes::{ISprite2D, Sprite2D};
+mod geoclipmap;
 
-struct FastTerrain;
+use godot::{classes::RenderingServer, prelude::*};
+
+struct FastTerrainExtension;
 
 #[gdextension]
-unsafe impl ExtensionLibrary for FastTerrain {
+unsafe impl ExtensionLibrary for FastTerrainExtension {
     fn on_level_init(level: InitLevel) {
         match level {
             InitLevel::Editor => {
@@ -16,32 +17,55 @@ unsafe impl ExtensionLibrary for FastTerrain {
 }
 
 #[derive(GodotClass)]
-#[class(base=Sprite2D)]
-struct Player {
-    speed: f64,
-    angular_speed: f64,
+#[class(base=Node3D)]
+struct FastTerrain {
+    #[export]
+    region_size: RegionSize,
 
-    base: Base<Sprite2D>,
+    data_directory: GString,
+    is_inside_world: bool,
+    initialized: bool,
+    warnings: u8,
+
+    base: Base<Node3D>,
+}
+
+#[derive(GodotConvert, Var, Export)]
+#[godot(via = GString)]
+enum RegionSize {
+    Size64 = 64,
+    Size128 = 128,
+    Size256 = 256,
+    Size512 = 512,
+    Size1024 = 1024,
+    Size2048 = 2048,
 }
 
 #[godot_api]
-impl ISprite2D for Player {
-    fn init(base: Base<Sprite2D>) -> Self {
+impl INode3D for FastTerrain {
+    fn init(base: Base<Node3D>) -> Self {
         Self {
-            speed: 400.0,
-            angular_speed: std::f64::consts::PI,
+            region_size: RegionSize::Size256,
+            data_directory: "".into(),
+            is_inside_world: false,
+            initialized: false,
+            warnings: 0,
             base,
         }
     }
 
-    fn physics_process(&mut self, delta: f64) {
-        // In GDScript, this would be:
-        // rotation += angular_speed * delta
+    fn ready(&mut self) {
+        let new_node = RenderingServer::singleton().instance_create();
+        if new_node.is_valid() {
+        // self.base().get_tree().unwrap().get_root().unwrap().add_child(&new_node);
+        }
+        // self.base().get_tree().unwrap().get_root().unwrap().add_child(
 
-        let radians = (self.angular_speed * delta) as f32;
-        self.base_mut().rotate(radians);
-        // The 'rotate' method requires a f32,
-        // therefore we convert 'self.angular_speed * delta' which is a f64 to a f32
     }
 }
 
+impl FastTerrain {
+    fn build_meshes(&mut self, lods: i8, size: i32) {
+        godot_print!("Building meshes with {} LODs and size {}", lods, size);
+    }
+}
