@@ -1,24 +1,6 @@
 use godot::{classes::{rendering_server::{ArrayType, PrimitiveType}, RenderingServer}, meta::ParamType, prelude::*};
 use std::collections::HashMap;
-
-#[derive(PartialEq, Eq, Hash)]
-struct Vector3Key {
-    x: i32,
-    y: i32,
-    z: i32,
-}
-
-impl Vector3Key {
-    fn from_vector3(v: Vector3) -> Self {
-        // Convert to fixed point to avoid floating point comparison issues
-        const SCALE: f32 = 1000.0;
-        Self {
-            x: (v.x * SCALE) as i32,
-            y: (v.y * SCALE) as i32,
-            z: (v.z * SCALE) as i32,
-        }
-    }
-}
+use crate::types::Vector3Hash;
 
 pub struct GeoClipMap;
 
@@ -32,10 +14,10 @@ impl GeoClipMap {
             (p1 + p2) / 2.0
         };
 
-        let find_or_add_vertex = |vertex_map: &mut HashMap<Vector3Key, i32>, 
+        let find_or_add_vertex = |vertex_map: &mut HashMap<Vector3Hash, i32>, 
                                  new_vertices: &mut PackedVector3Array,
                                  vertex: Vector3| -> i32 {
-            let key = Vector3Key::from_vector3(vertex);
+            let key = Vector3Hash::from_vector3(vertex);
             if let Some(&index) = vertex_map.get(&key) {
                 index
             } else {
@@ -53,8 +35,8 @@ impl GeoClipMap {
             let id_2 = chunk[2];
 
             let a = vertices.get(id_0 as usize).unwrap();
-            let b = vertices.get(id_1 as usize).unwrap();;
-            let c = vertices.get(id_2 as usize).unwrap();;
+            let b = vertices.get(id_1 as usize).unwrap();
+            let c = vertices.get(id_2 as usize).unwrap();
 
             let length_ab = (b - a).length_squared();
             let length_bc = (c - b).length_squared();
@@ -370,23 +352,22 @@ impl GeoClipMap {
             let mut indicies = PackedInt32Array::new();
             indicies.resize((clipmap_vert_resolution * 6) as usize);
 
-            let mut n = 0;
             for i in 0..clipmap_vert_resolution {
-                n = clipmap_vert_resolution * 0 + i;
-                vertices[n as usize] = Vector3::new(i as f32, 0.0, 0.0);
-                aabb.expand(vertices[n as usize]);
+                let n = (clipmap_vert_resolution * 0 + i) as usize;
+                vertices[n] = Vector3::new(i as f32, 0.0, 0.0);
+                aabb.expand(vertices[n]);
 
-                n = clipmap_vert_resolution * 1 + i;
-                vertices[n as usize] = Vector3::new(clipmap_vert_resolution as f32, 0.0, i as f32);
-                aabb.expand(vertices[n as usize]);
+                let n = (clipmap_vert_resolution * 1 + i) as usize;
+                vertices[n] = Vector3::new(clipmap_vert_resolution as f32, 0.0, i as f32);
+                aabb.expand(vertices[n]);
                 
-                n = clipmap_vert_resolution * 2 + i;
-                vertices[n as usize] = Vector3::new((clipmap_vert_resolution - i) as f32, 0.0, clipmap_vert_resolution as f32);
-                aabb.expand(vertices[n as usize]);
+                let n = (clipmap_vert_resolution * 2 + i) as usize;
+                vertices[n] = Vector3::new((clipmap_vert_resolution - i) as f32, 0.0, clipmap_vert_resolution as f32);
+                aabb.expand(vertices[n]);
 
-                n = clipmap_vert_resolution * 3 + i;
-                vertices[n as usize] = Vector3::new(0.0, 0.0, (clipmap_vert_resolution - i) as f32);
-                aabb.expand(vertices[n as usize]);
+                let n = (clipmap_vert_resolution * 3 + i) as usize;
+                vertices[n] = Vector3::new(0.0, 0.0, (clipmap_vert_resolution - i) as f32);
+                aabb.expand(vertices[n]);
             }
 
             let mut n = 0;
