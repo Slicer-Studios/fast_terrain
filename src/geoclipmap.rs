@@ -89,7 +89,7 @@ impl GeoClipMap {
 
     fn create_mesh(vertices: &PackedVector3Array, indices: &PackedInt32Array, aabb: Aabb) -> Rid {
         let mut arrays = Array::new();
-        arrays.resize(ArrayType::MAX.ord() as usize, Variant::nil().owned_to_arg());
+        arrays.resize(ArrayType::MAX.ord() as usize, &Variant::nil());
         
         arrays.set(ArrayType::VERTEX.ord() as usize, vertices.to_variant().owned_to_arg());
         arrays.set(ArrayType::INDEX.ord() as usize, indices.to_variant().owned_to_arg());

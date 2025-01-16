@@ -190,7 +190,7 @@ impl FastTerrainMeshAsset {
         }
 
         let mut arrays = Array::new();
-        arrays.resize(ArrayType::MAX.ord() as usize, Variant::nil().owned_to_arg());
+        arrays.resize(ArrayType::MAX.ord() as usize, &Variant::nil());
         arrays.set(ArrayType::VERTEX.ord() as usize, vertices.to_variant().owned_to_arg());
         arrays.set(ArrayType::NORMAL.ord() as usize, normals.to_variant().owned_to_arg());
         arrays.set(ArrayType::TANGENT.ord() as usize, tangents.to_variant().owned_to_arg());

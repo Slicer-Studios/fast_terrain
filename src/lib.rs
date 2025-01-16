@@ -1,6 +1,7 @@
 mod fast_terrain_assets_resource;
 mod fast_terrain_assets;
 mod fast_terrain_mesh_asset;
+mod fast_terrain_region;
 mod fast_terrain_texture_asset;
 mod generated_texture;
 mod geoclipmap;
