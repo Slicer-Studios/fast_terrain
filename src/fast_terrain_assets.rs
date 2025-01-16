@@ -1,5 +1,6 @@
+use godot::classes::{ImageTexture, RenderingServer, ResourceSaver};
+use godot::global::Error;
 use godot::prelude::*;
-use std::collections::HashMap;
 
 use crate::fast_terrain_texture_asset::FastTerrainTextureAsset;
 use crate::{
@@ -63,15 +64,15 @@ impl IResource for FastTerrainAssets {
             base,
             texture_list: Vec::new(),
             mesh_list: Vec::new(),
-            scenario: Rid::default(),
-            viewport: Rid::default(),
-            viewport_texture: Rid::default(),
-            camera: Rid::default(),
-            key_light: Rid::default(),
-            key_light_instance: Rid::default(),
-            fill_light: Rid::default(),
-            fill_light_instance: Rid::default(),
-            mesh_instance: Rid::default(),
+            scenario: Rid::new(0),
+            viewport: Rid::new(0),
+            viewport_texture: Rid::new(0),
+            camera: Rid::new(0),
+            key_light: Rid::new(0),
+            key_light_instance: Rid::new(0),
+            fill_light: Rid::new(0),
+            fill_light_instance: Rid::new(0),
+            mesh_instance: Rid::new(0),
             generated_albedo_textures: None,
             generated_normal_textures: None,
             texture_colors: PackedColorArray::new(),
@@ -282,11 +283,12 @@ impl FastTerrainAssets {
             self.base().get_path()
         };
 
-        if path.get_extension() == "tres" || path.get_extension() == "res" {
+        if path.get_extension() == "tres".into() || path.get_extension() == "res".into() {
             godot_print!("Attempting to save external file: {}", path);
-            if let Err(err) = ResourceSaver::singleton().save(self.base(), path) {
-                godot_print!("Cannot save file. Error code: {}", err);
-                return err;
+            let result = ResourceSaver::singleton().save_ex(&self.base().clone().cast::<Resource>()).path(&path).done();
+            if result != Error::OK {
+                godot_print!("Cannot save file. Error code: {}", result.ord());
+                return result;
             }
         }
 
@@ -296,7 +298,7 @@ impl FastTerrainAssets {
 
 impl Drop for FastTerrainAssets {
     fn drop(&mut self) {
-        let rs = RenderingServer::singleton();
+        let mut rs = RenderingServer::singleton();
         rs.free_rid(self.mesh_instance);
         rs.free_rid(self.fill_light_instance);
         rs.free_rid(self.fill_light);

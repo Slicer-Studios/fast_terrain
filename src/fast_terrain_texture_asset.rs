@@ -3,7 +3,7 @@ use crate::fast_terrain_assets::{AssetType, MAX_TEXTURES};
 use crate::fast_terrain_assets_resource::{FastTerrainAssetResource, FastTerrainAssetResourceImpl};
 
 #[derive(GodotClass)]
-#[class(base=Resource)]
+#[class(tool, base=Resource)]
 pub struct FastTerrainTextureAsset {
     #[base]
     base: Base<Resource>,

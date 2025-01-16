@@ -3,13 +3,32 @@ use godot::{
     prelude::*,
 };
 
+#[derive(GodotClass)]
+#[class(no_init)]
 pub struct GeneratedTexture {
     rid: Rid,
     image: Option<Gd<Image>>,
     dirty: bool,
 }
 
+#[godot_api]
 impl GeneratedTexture {
+    #[func]
+    pub fn is_dirty(&self) -> bool {
+        self.dirty
+    }
+
+    #[func]
+    pub fn get_image(&self) -> Option<Gd<Image>> {
+        self.image.clone()
+    }
+
+    #[func]
+    pub fn get_rid(&self) -> Rid {
+        self.rid
+    }
+
+    #[func]
     pub fn clear(&mut self) {
         if self.rid.is_valid() {
             godot_print!("GeneratedTexture freeing {}", self.rid);
@@ -25,6 +44,7 @@ impl GeneratedTexture {
         self.dirty = true;
     }
 
+    #[func]
     pub fn create_from_layers(&mut self, layers: Array<Gd<Image>>) -> Rid {
         if !layers.is_empty() {
             godot_print!("RenderingServer creating Texture2DArray, layers size: {}", layers.len());
@@ -51,11 +71,13 @@ impl GeneratedTexture {
         self.rid
     }
 
-    pub fn update(&self, image: Gd<Image>, layer: i32) {
+    #[func]
+    pub fn update(&mut self, image: Gd<Image>, layer: i32) {
         godot_print!("RenderingServer updating Texture2DArray at index: {}", layer);
         RenderingServer::singleton().texture_2d_update(self.rid, &image, layer);
     }
 
+    #[func]
     pub fn create(&mut self, image: Gd<Image>) -> Rid {
         godot_print!("RenderingServer creating Texture2D");
         self.image = Some(image.clone());

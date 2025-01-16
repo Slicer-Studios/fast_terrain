@@ -16,7 +16,7 @@ enum GenType {
 }
 
 #[derive(GodotClass)]
-#[class(base=Resource)]
+#[class(tool, base=Resource)]
 pub struct FastTerrainMeshAsset {
     #[base]
     base: Base<Resource>,
